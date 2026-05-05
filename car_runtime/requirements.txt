@@ -1,5 +1,7 @@
+streamlit
+PyYAML==6.0.1
 z3-solver
+pydantic
 networkx
 numpy
 scipy
-PyYAML
