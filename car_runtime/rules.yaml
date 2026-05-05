@@ -1,0 +1,30 @@
+# Computational Constitutional Rules
+# These hard limits are mathematically bound and evaluated by the SMT Solvers
+
+constraints:
+  - id: "c1_safety"
+    name: "Safety Risk Threshold"
+    type: "safety"
+    variable: "predicted_risk"
+    operator: "<"
+    threshold: 0.1
+    is_hard: true
+    description: "The predicted risk must be strictly less than 0.1"
+
+  - id: "c2_fairness"
+    name: "Demographic Fairness Bound"
+    type: "fairness"
+    variable: "predicted_fairness"
+    operator: ">="
+    threshold: 0.95
+    is_hard: true
+    description: "The demographic parity/fairness score must be at least 0.95"
+
+  - id: "c3_utility"
+    name: "Utility Maximization Baseline"
+    type: "utility"
+    variable: "utility"
+    operator: ">"
+    threshold: 0.0
+    is_hard: false
+    description: "The decision should yield a positive utility"
