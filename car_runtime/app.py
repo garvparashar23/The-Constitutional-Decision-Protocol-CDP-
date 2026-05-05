@@ -4,6 +4,7 @@ import time
 import json
 import logging
 from main import ConstitutionalAIRuntime
+from visualizations import render_observability_layer
 
 # --- UI Configuration ---
 st.set_page_config(page_title="CAR | Formal Verification Console", layout="wide", initial_sidebar_state="expanded")
@@ -262,6 +263,14 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Sidebar: Display the Constitution
 with st.sidebar:
+    st.header("⚙️ Configuration")
+    api_key = st.text_input("Groq API Key", type="password", value="", help="Required: Enter your Groq API Key to run the generation engine.")
+    if api_key:
+        import os
+        os.environ["GROQ_API_KEY"] = api_key
+        
+    st.markdown("---")
+
     st.header("Statutory Axioms")
     st.markdown("<p style='color: #94A3B8; font-size: 0.9rem;'>Mathematical invariances enforced strictly by the SMT Prover.</p>", unsafe_allow_html=True)
     st.markdown("---")
@@ -294,6 +303,11 @@ if st.button("Initiate Formal Verification Protocol", type="primary", use_contai
     
     # Run the pipeline
     with st.spinner("Synthesizing and formally proving intervention..."):
+        import os
+        if "GROQ_API_KEY" not in os.environ or not os.environ["GROQ_API_KEY"].strip():
+            st.error("⚠️ Please enter your Groq API Key in the sidebar Configuration section to proceed.")
+            st.stop()
+            
         car = ConstitutionalAIRuntime()
         request = {
             "context": user_input,
@@ -368,6 +382,9 @@ if st.button("Initiate Formal Verification Protocol", type="primary", use_contai
                     st.markdown(f"**Risk Score:** `{cand.content.get('predicted_risk', 'N/A')}`")
                     st.markdown(f"**Fairness Score:** `{cand.content.get('predicted_fairness', 'N/A')}`")
                     st.markdown(f"**Utility Score:** `{cand.content.get('dro_utility', 'N/A')}`")
+
+        # --- Visualization & Observability Layer ---
+        render_observability_layer(payload)
         
     else:
         st.error("System Override: Infeasibility detected. No candidate intervention satisfied the mathematical bounds.")
