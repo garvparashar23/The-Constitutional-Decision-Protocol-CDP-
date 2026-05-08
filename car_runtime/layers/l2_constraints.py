@@ -1,54 +1,29 @@
-import z3
-from typing import List, Dict
 import logging
+from typing import List, Dict, Any
 from core.types import Constraint
-
-import yaml
+from constitution.rule_loader import RuleLoader
+from constitution.parser import ConstitutionParser
+from constitution.compiler import ConstitutionCompiler
 
 logger = logging.getLogger("L2_ConstraintCompilation")
 
 class ConstraintCompilationLayer:
     """
     Layer 2: Constraint Compilation
-    Compiles human-readable YAML norms into First-Order Logic (FOL) and Z3 SMT constraints.
+    Wraps the Formal Constitution Engine to parse YAML rules and compile them into Z3 constraints.
     """
     def __init__(self):
-        self.solver = z3.Solver()
-        self.variables = {
-            "predicted_risk": z3.Real('predicted_risk'),
-            "predicted_fairness": z3.Real('predicted_fairness'),
-            "utility": z3.Real('utility')
-        }
+        self.rule_loader = RuleLoader()
+        self.parser = ConstitutionParser()
+        self.compiler = ConstitutionCompiler()
         
     def load_rules_from_yaml(self, filepath: str) -> List[Dict[str, Any]]:
-        with open(filepath, 'r') as f:
-            data = yaml.safe_load(f)
-        return data.get("constraints", [])
+        # For backward compatibility, we ignore filepath and load all rules from the formal dir
+        logger.info("Loading formal constitutional rules...")
+        return self.rule_loader.load_all_rules()
         
     def compile_norms_to_smt(self, norms: List[Dict[str, Any]]) -> List[Constraint]:
-        logger.info(f"Compiling {len(norms)} YAML norms into SMT constraints.")
-        compiled = []
-        
-        for norm in norms:
-            var = self.variables.get(norm["variable"])
-            if var is None:
-                continue
-                
-            threshold = norm["threshold"]
-            op = norm["operator"]
-            
-            if op == "<": expr = var < threshold
-            elif op == "<=": expr = var <= threshold
-            elif op == ">": expr = var > threshold
-            elif op == ">=": expr = var >= threshold
-            elif op == "==": expr = var == threshold
-            else: continue
-            
-            compiled.append(Constraint(
-                id=norm["id"], 
-                name=norm["name"], 
-                logic_expr=expr, 
-                is_hard=norm.get("is_hard", True)
-            ))
-                
-        return compiled
+        logger.info(f"Using Constitution Engine to compile {len(norms)} norms.")
+        parsed_rules = self.parser.parse(norms)
+        return self.compiler.compile(parsed_rules)
+

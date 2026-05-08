@@ -5,97 +5,114 @@ import random
 import asyncio
 import logging
 from typing import List, Dict, Any
-from core.types import SanitizedProposal, TokenizedDecision, Constraint
+from core.types import SanitizedProposal, TokenizedDecision, Constraint, DecisionProposal
 from layers.adversarial_scoring import AdversarialScoreboard
+
+from agents.safety_agent import SafetyAgent
+from agents.ethics_agent import EthicsAgent
+from agents.economic_agent import EconomicAgent
+from agents.legal_agent import LegalAgent
+from agents.human_rights_agent import HumanRightsAgent
+from agents.sustainability_agent import SustainabilityAgent
+from debate_history.debate_manager import DebateManager
 
 logger = logging.getLogger("L6_AdjudicationEngine")
 
-# A secure secret key for the HMAC token generation (in prod, this is in an env var isolated from D)
+# A secure secret key for the HMAC token generation
 VALIDATOR_SECRET = b"ASCR_VALIDATOR_STRICT_ISOLATION_KEY_99812"
 
-class AdjudicationAgent:
-    def __init__(self, agent_id: str):
-        self.agent_id = agent_id
+class AdjudicationEngine:
+    """
+    ASCR Layer 6: Multi-Agent Constitutional Council & Formal Validator
+    """
+    def __init__(self):
+        self.agents = [
+            SafetyAgent(),
+            EthicsAgent(),
+            EconomicAgent(),
+            LegalAgent(),
+            HumanRightsAgent(),
+            SustainabilityAgent()
+        ]
+        self.debate_manager = DebateManager()
+        self.scoreboard = AdversarialScoreboard()
         self.solver = z3.Solver()
-        # Layer 6: Randomization & Unpredictability
-        # Each agent applies a slight randomized epsilon to constraints to break D's ability to perfectly predict the boundary
-        self.random_epsilon = random.uniform(-0.01, 0.01)
-
-    async def verify(self, prop: SanitizedProposal, constraints: List[Constraint]) -> bool:
-        await asyncio.sleep(0.01) # Simulated network isolation delay
-        self.solver.push()
         
-        # Map isolated features to Z3 logic
+    def _generate_approval_token(self, prop: SanitizedProposal) -> str:
+        payload = f"{prop.id}:{prop.action}:{prop.predicted_risk}".encode('utf-8')
+        return hmac.new(VALIDATOR_SECRET, payload, hashlib.sha256).hexdigest()
+
+    async def _run_debate(self, prop: SanitizedProposal) -> float:
+        """Runs the debate across all agents and returns a consensus score."""
+        logger.info(f"--- Round 1: Objections & Amendments for {prop.id} ---")
+        agent_evaluations = {}
+        for agent in self.agents:
+            result = agent.evaluate(prop, context={})
+            agent_evaluations[agent.name] = result
+            self.debate_manager.log_debate_round(
+                proposal_id=prop.id,
+                agent_name=agent.name,
+                objection=result["objection"],
+                proposed_amendment=result["amendment"],
+                score=result["score"]
+            )
+            
+        objections = self.debate_manager.get_objections(prop.id)
+        
+        logger.info(f"--- Round 2: Counterarguments for {prop.id} ---")
+        for agent in self.agents:
+            counter = agent.generate_counterargument(prop, objections, context={})
+            # Log the counterargument as an update to the debate round (or just trace it)
+            logger.debug(f"{agent.name} counterargument: {counter}")
+            # For simplicity, we keep the original score but now we have the full debate stored.
+            # In a full LLM setup, the agents might update their scores based on counterarguments.
+
+        consensus = self.debate_manager.get_consensus_score(prop.id)
+        logger.info(f"Debate concluded for {prop.id}. Final Consensus: {consensus:.2f}")
+        return consensus
+
+    def _formal_z3_verification(self, prop: SanitizedProposal, constraints: List[Constraint]) -> bool:
+        """Final strict mathematical check against compiled Z3 constraints."""
+        self.solver.push()
         risk = z3.Real('predicted_risk')
         fairness = z3.Real('predicted_fairness')
         utility = z3.Real('utility')
         
-        # Add system constraints
         for c in constraints:
             if c.is_hard:
                 self.solver.add(c.logic_expr)
                 
-        # Stochastic validation boundary:
-        # Instead of parsing the raw operator (which is lost after Z3 compilation),
-        # we inject the epsilon into the parsed values themselves to represent noisy sensor logic.
-        noisy_risk = prop.predicted_risk + self.random_epsilon
-        noisy_fairness = prop.predicted_fairness + self.random_epsilon
-        
-        # Strictly evaluate only the SanitizedProposal with stochastic noise
-        self.solver.add(risk == z3.RealVal(noisy_risk))
-        self.solver.add(fairness == z3.RealVal(noisy_fairness))
+        self.solver.add(risk == z3.RealVal(prop.predicted_risk))
+        self.solver.add(fairness == z3.RealVal(prop.predicted_fairness))
         self.solver.add(utility == z3.RealVal(prop.dro_utility))
         
         result = self.solver.check()
         self.solver.pop()
-        
         return (result == z3.sat)
 
-class AdjudicationEngine:
-    """
-    ASCR Layer 6: Adversarial Validator & Cryptographic Token Issuer
-    """
-    def __init__(self, num_agents: int = 4):
-        self.agents = [AdjudicationAgent(f"Validator_{i}") for i in range(num_agents)]
-        self.scoreboard = AdversarialScoreboard()
-        
-    def _generate_approval_token(self, prop: SanitizedProposal) -> str:
-        """Generates a cryptographic execution token that the finalization layer will strictly require."""
-        payload = f"{prop.id}:{prop.action}:{prop.predicted_risk}".encode('utf-8')
-        return hmac.new(VALIDATOR_SECRET, payload, hashlib.sha256).hexdigest()
-
-    async def _async_verify_all(self, prop: SanitizedProposal, constraints: List[Constraint]) -> int:
-        tasks = [agent.verify(prop, constraints) for agent in self.agents]
-        results = await asyncio.gather(*tasks)
-        return sum(results)
-
     def execute_consensus(self, proposals: List[SanitizedProposal], original_proposals: Dict[str, DecisionProposal], constraints: List[Constraint]) -> List[TokenizedDecision]:
-        logger.info(f"Validator: Examining {len(proposals)} proposals via BFT. (D's gradients and state are completely hidden)")
+        logger.info(f"Constitutional AI Parliament: Deliberating on {len(proposals)} proposals.")
         valid_decisions = []
         
-        f = (len(self.agents) - 1) // 3
-        required_signatures = len(self.agents) - f
-        
         for prop in proposals:
-            votes = asyncio.run(self._async_verify_all(prop, constraints))
+            # 1. Multi-Agent Debate
+            consensus_score = asyncio.run(self._run_debate(prop))
             
-            if votes >= required_signatures:
-                # Adversarial Objective: D wins, V loses
+            # 2. Formal Z3 Verification
+            math_verified = self._formal_z3_verification(prop, constraints)
+            
+            if consensus_score >= 0.75 and math_verified:
                 self.scoreboard.record_pass()
-                
-                # Issue cryptographic token
                 token = self._generate_approval_token(prop)
-                
-                # Repackage into TokenizedDecision for Execution layer
                 decision = TokenizedDecision(
                     original_proposal=original_proposals[prop.id],
                     approval_token=token
                 )
                 valid_decisions.append(decision)
-                logger.info(f"Validator: Proposal {prop.id} mathematically verified. Cryptographic Approval Token issued.")
+                logger.info(f"Parliament Consensus reached. Proposal {prop.id} verified. Token issued.")
             else:
-                # Adversarial Objective: V wins, D loses
                 self.scoreboard.record_rejection()
-                logger.warning(f"Validator: Proposal {prop.id} REJECTED. Mathematical constraints violated.")
+                logger.warning(f"Parliament REJECTED {prop.id}. Consensus: {consensus_score:.2f}, Math Verif: {math_verified}")
                 
         return valid_decisions
+

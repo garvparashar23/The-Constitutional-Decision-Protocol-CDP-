@@ -32,7 +32,7 @@ class GovernanceEngine:
 
 class CARSystem:
     """
-    Central Orchestrator for the Constitutional AI Runtime (IDS Variant)
+    Central Orchestrator for the Constitutional Decision Protocol (CDP) (IDS Variant)
     Enforces the pipeline: x -> Executor -> Validator -> Challenger -> Auditor -> Governance -> Output
     """
     def __init__(self, executor, validator, challenger, auditor):

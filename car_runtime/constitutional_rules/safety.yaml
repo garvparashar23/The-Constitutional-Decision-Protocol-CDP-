@@ -1,0 +1,19 @@
+principles:
+  - principle:
+      id: SAFETY_001
+      description: Prevent catastrophic harm
+      priority: 10
+      temporal: ALWAYS
+      constraint:
+        type: risk_limit
+        max_risk: 0.1
+
+  - principle:
+      id: SAFETY_002
+      description: Maintain system stability
+      priority: 8
+      temporal: UNTIL
+      condition: crisis_resolved == 1.0
+      constraint:
+        type: stability_bound
+        max_instability: 0.2

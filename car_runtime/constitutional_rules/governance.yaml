@@ -1,0 +1,18 @@
+principles:
+  - principle:
+      id: GOV_001
+      description: Positive Utility Baseline
+      priority: 5
+      temporal: EVENTUALLY
+      constraint:
+        type: utility_baseline
+        min_utility: 0.0
+
+  - principle:
+      id: GOV_002
+      description: Adversarial Robustness
+      priority: 9
+      temporal: ALWAYS
+      constraint:
+        type: robustness_bound
+        min_robustness: 0.9

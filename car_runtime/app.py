@@ -7,7 +7,7 @@ from main import ConstitutionalAIRuntime
 from visualizations import render_observability_layer
 
 # --- UI Configuration ---
-st.set_page_config(page_title="CAR | Formal Verification Console", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="CDP | Formal Verification Console", layout="wide", initial_sidebar_state="expanded")
 
 # --- Custom CSS for Premium Professional Aesthetic ---
 st.markdown("""
@@ -238,7 +238,7 @@ def explain_output(decision_payload):
         """, unsafe_allow_html=True)
 
 # --- Main Dashboard ---
-st.title("CONSTITUTIONAL AI RUNTIME")
+st.title("THE CONSTITUTIONAL DECISION PROTOCOL (CDP)")
 st.markdown("### Formal Verification & Autonomous Adjudication Console")
 st.markdown("<br>", unsafe_allow_html=True)
 

@@ -31,7 +31,7 @@ def main():
     logger.info("Simulating incoming network traffic tensor (x)...")
     dummy_traffic_x = torch.randn(1, 10, 20)
     
-    # Run the Constitutional AI Runtime Protocol
+    # Run the Constitutional Decision Protocol (CDP)
     final_decision = car_system.process(dummy_traffic_x)
     
     # Print the outcome

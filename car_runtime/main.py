@@ -109,7 +109,7 @@ if __name__ == "__main__":
     car = ConstitutionalAIRuntime()
     
     print("\n" + "="*60)
-    print(" CONSTITUTIONAL AI RUNTIME - INTERACTIVE MODE")
+    print(" THE CONSTITUTIONAL DECISION PROTOCOL (CDP) - INTERACTIVE MODE")
     print("="*60)
     
     user_context = input("\nWhat scenario do you want the AI to solve?\n(e.g., 'Decide on a bank loan for User A' or press Enter for default):\n> ")

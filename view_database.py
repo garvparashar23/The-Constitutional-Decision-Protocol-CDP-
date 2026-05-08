@@ -3,7 +3,7 @@ import json
 
 def view_database():
     print("="*60)
-    print(" CONSTITUTIONAL AI RUNTIME - FINAL AUDIT LOG")
+    print(" THE CONSTITUTIONAL DECISION PROTOCOL (CDP) - FINAL AUDIT LOG")
     print("="*60)
     
     try:

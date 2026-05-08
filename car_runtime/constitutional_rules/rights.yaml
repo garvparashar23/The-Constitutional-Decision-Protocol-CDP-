@@ -1,0 +1,18 @@
+principles:
+  - principle:
+      id: RIGHTS_001
+      description: Privacy Protection
+      priority: 10
+      temporal: ALWAYS
+      constraint:
+        type: privacy_bound
+        max_violation: 0.0
+
+  - principle:
+      id: RIGHTS_002
+      description: Freedom of Expression
+      priority: 8
+      temporal: EVENTUALLY
+      constraint:
+        type: censorship_limit
+        max_censorship: 0.2

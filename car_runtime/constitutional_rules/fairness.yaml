@@ -1,0 +1,18 @@
+principles:
+  - principle:
+      id: FAIRNESS_001
+      description: Maintain demographic parity
+      priority: 9
+      temporal: ALWAYS
+      constraint:
+        type: fairness_bound
+        min_fairness: 0.95
+
+  - principle:
+      id: FAIRNESS_002
+      description: Eliminate historical bias
+      priority: 7
+      temporal: EVENTUALLY
+      constraint:
+        type: bias_limit
+        max_bias: 0.05
