@@ -2,3 +2,8 @@ z3-solver
 networkx
 numpy
 scipy
+PyYAML
+streamlit
+plotly
+pandas
+groq
