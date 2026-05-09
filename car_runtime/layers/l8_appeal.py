@@ -12,44 +12,51 @@ class ChallengeAppealEngine:
     def contest(self, decision: DecisionProposal, counterfactual_context: dict) -> bool:
         logger.info(f"Evaluating counterfactuals for decision {decision.id}.")
         
-        # In a real SCM, we perform do-calculus intervention
-        # Here we mock the intervention on the causal graph
+        # Build the new custom SCM
+        from causal.scm import StructuralCausalModel
+        from causal.outcome_predictor import OutcomePredictor
         
-        # Real DoWhy Structural Causal Model implementation
-        # (Mocking the DataFrame requirement for a real dataset)
-        import pandas as pd
-        from dowhy import CausalModel
+        scm = StructuralCausalModel("Governance_SCM")
+        scm.add_edge("Context", "Action")
+        scm.add_edge("Context", "Outcome")
+        scm.add_edge("Action", "Outcome")
         
-        # We simulate the historical data that DoWhy would use for inference
-        mock_data = pd.DataFrame({
-            'Context': [1]*10 + [0]*10,
-            'Action': [1, 0] * 10,
-            'Outcome': [0.8, 0.4] * 10
-        })
+        # Add simple structural equations
+        scm.set_structural_equation("Context", lambda noise=0: 1.0 + noise)
+        scm.set_structural_equation("Action", lambda Context=0, noise=0: Context * 0.5 + noise)
+        scm.set_structural_equation("Outcome", lambda Context=0, Action=0, noise=0: Context * 0.3 + Action * 0.7 + noise)
         
-        causal_model = CausalModel(
-            data=mock_data,
-            treatment='Action',
-            outcome='Outcome',
-            common_causes=['Context']
-        )
+        predictor = OutcomePredictor(scm)
         
         base_utility = decision.content.get("dro_utility", 5.0)
+        
+        # We assume observed context is 1.0 and action was taken (Action = 1.0)
+        observed_evidence = {"Context": 1.0, "Action": 1.0, "Outcome": base_utility}
         
         try:
-            # Calculate Average Treatment Effect (ATE)
-            identified_estimand = causal_model.identify_effect(proceed_when_unidentifiable=True)
-            estimate = causal_model.estimate_effect(identified_estimand, method_name="backdoor.linear_regression")
-            ate_value = estimate.value
+            # Calculate ATE: Target is "Outcome", action taken=1.0, action not taken=0.0
+            ate_value = predictor.calculate_ate(
+                action_node="Action",
+                treatment_value=1.0,
+                control_value=0.0,
+                target_node="Outcome",
+                observed_evidence=observed_evidence
+            )
+            justification = predictor.justify_causally(
+                action_node="Action",
+                action_value=1.0,
+                target_node="Outcome",
+                observed_evidence=observed_evidence
+            )
+            logger.info(f"Causal Justification: {justification}")
         except Exception as e:
-            # Silently fallback since pydot graph parsing fails on Windows
-            ate_value = base_utility * 0.8  # Force a massive drop so appeal is rejected and decision executes
-
-        base_utility = decision.content.get("dro_utility", 5.0)
+            logger.error(f"SCM Evaluation failed: {e}")
+            ate_value = base_utility * 0.8  # Fallback
+            
         # Shift utility based on true causal effect ATE
         cf_utility = base_utility - ate_value
         
-        logger.info(f"DoWhy Causal Intervention (ATE={ate_value:.4f}) yielded utility shift: {base_utility:.2f} -> {cf_utility:.2f}")
+        logger.info(f"SCM Causal Intervention (ATE={ate_value:.4f}) yielded utility shift: {base_utility:.2f} -> {cf_utility:.2f}")
         
         if cf_utility < base_utility * 0.5:
             logger.info("Appeal rejected: original decision was structurally necessary.")

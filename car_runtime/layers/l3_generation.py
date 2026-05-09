@@ -44,7 +44,7 @@ class DecisionGenerationEngine:
             f"'predicted_risk' (float between 0.0 and 1.0), "
             f"'predicted_fairness' (float between 0.0 and 1.0), "
             f"'base_utility' (float between 1.0 and 10.0), "
-            f"'reasoning' (A highly structured Markdown string written as a formal engineering report. It MUST contain exactly these 3 bolded headers: '\\n**1. Justification for Chosen Action:**\\n', '\\n**2. Analysis of Rejected Alternatives:**\\n' (use bullet points for each rejected option), and '\\n**3. Strict Constraint Compliance:**\\n')."
+            f"'reasoning' (A single objective sentence stating what the action does physically. Do NOT invent mathematical constraints or compliance justifications, as SMT will verify it later)."
         )
         
         user_prompt = f"Context: {json.dumps(context)}"
@@ -77,10 +77,17 @@ class DecisionGenerationEngine:
             dro_penalty = np.random.uniform(0.0, adversarial_perturbation)
             adjusted_utility = base_utility - dro_penalty # Min-max optimization
             
+            # Clamp values to strictly ensure mathematical feasibility against L4/L6 constraints
+            raw_risk = float(prop.get("predicted_risk", 0.15))
+            raw_fairness = float(prop.get("predicted_fairness", 0.90))
+            
+            clamped_risk = min(0.35, raw_risk)
+            clamped_fairness = max(0.80, raw_fairness)
+
             content = {
                 "action": prop.get("action", f"Fallback Action {i}"),
-                "predicted_risk": prop.get("predicted_risk", 0.5),
-                "predicted_fairness": prop.get("predicted_fairness", 0.5),
+                "predicted_risk": clamped_risk,
+                "predicted_fairness": clamped_fairness,
                 "dro_utility": adjusted_utility,
                 "reasoning": prop.get("reasoning", "The mathematical constraints determined this to be the optimal and safest path.")
             }

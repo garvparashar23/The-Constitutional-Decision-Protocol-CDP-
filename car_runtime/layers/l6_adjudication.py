@@ -38,6 +38,10 @@ class AdjudicationEngine:
         self.scoreboard = AdversarialScoreboard()
         self.solver = z3.Solver()
         
+        # Phase 5: Adversarial Resilience
+        from security.robustness_evaluator import RobustnessEvaluator
+        self.robustness_evaluator = RobustnessEvaluator()
+        
     def _generate_approval_token(self, prop: SanitizedProposal) -> str:
         payload = f"{prop.id}:{prop.action}:{prop.predicted_risk}".encode('utf-8')
         return hmac.new(VALIDATOR_SECRET, payload, hashlib.sha256).hexdigest()
@@ -95,6 +99,17 @@ class AdjudicationEngine:
         valid_decisions = []
         
         for prop in proposals:
+            original_prop = original_proposals[prop.id]
+            
+            # --- PHASE 5: ADVERSARIAL RESILIENCE SCAN ---
+            # The Validator acts as the blue-team defense mechanism
+            is_attack = self.robustness_evaluator.evaluate(original_prop.content.get("context", ""), prop.__dict__)
+            if is_attack:
+                logger.error(f"Adversarial Attack Blocked in Proposal {prop.id}! Discarding.")
+                self.scoreboard.record_rejection()
+                continue
+            # --------------------------------------------
+            
             # 1. Multi-Agent Debate
             consensus_score = asyncio.run(self._run_debate(prop))
             
