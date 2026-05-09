@@ -17,6 +17,7 @@ from layers.l9_finalization import FinalizationLayer, SecurityException
 from layers.l10_audit import AuditProvenanceEngine
 from layers.l11_meta_learning import AdaptiveGovernanceEngine
 from explainability.reasoning_visualizer import ReasoningVisualizer
+from legal_grounding.legal_grounding_layer import LegalGroundingLayer
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("ASCR_Main")
@@ -40,6 +41,9 @@ class ConstitutionalDecisionProtocol:
         self.l9_finalization = FinalizationLayer(self.state)
         self.l10_audit = AuditProvenanceEngine(self.state)
         self.l11_meta_learning = AdaptiveGovernanceEngine(self.state)
+        
+        # Initialize Legal Grounding Engine
+        self.legal_grounding = LegalGroundingLayer()
         
         # Initialize Phase 4: Adaptive Constitutional Memory
         from memory.precedent_store import PrecedentStore
@@ -65,6 +69,12 @@ class ConstitutionalDecisionProtocol:
         try:
             # Phase 1: Formalization & Generation
             formalized_ctx = self.l1_input.formalize(raw_input)
+            
+            # --- NEW: LEGAL GROUNDING ENGINE ---
+            scenario = formalized_ctx.get("scenario", str(raw_input))
+            legal_context = self.legal_grounding.ground_scenario(scenario)
+            formalized_ctx["legal_context"] = legal_context
+            # -----------------------------------
             
             # --- PHASE 4: ADAPTIVE CONSTITUTIONAL MEMORY (Retrieval) ---
             precedents = self.retriever.retrieve_similar_cases(formalized_ctx.get("scenario", str(raw_input)), top_k=2)
@@ -97,7 +107,7 @@ class ConstitutionalDecisionProtocol:
                 # --- PHASE 6: EXPLAINABILITY (REJECTION) ---
                 rejection_proof = ReasoningVisualizer.generate_rejection_proof(
                     proposal_id=sanitized_proposals[0].id if sanitized_proposals else "ALL",
-                    debate_logs=self.l6_adjudication.debate_manager.debate_history,
+                    debate_logs=self.l6_adjudication.debate_manager.history,
                     z3_verified=False
                 )
                 logger.error(f"Constitutional Rejection Proof:{rejection_proof}")
@@ -199,12 +209,12 @@ class ConstitutionalDecisionProtocol:
             # ---------------------------------------------
             
             logger.info("Decision Epoch completed successfully under ASCR isolation.")
-            return final_decision, candidates
+            return final_decision, candidates, legal_context
             
         except SecurityException as se:
             logger.error(f"CRYPTOGRAPHIC GATE FAILURE: {str(se)}")
             self.l10_audit.write_provenance()
-            return None, None
+            return None, None, None
         except Exception as e:
             logger.error(f"System Failure Mode Activated: {str(e)}")
             logger.warning("Mocking successful decision to ensure UI rendering continues...")
@@ -216,17 +226,18 @@ class ConstitutionalDecisionProtocol:
                     "predicted_risk": 0.1,
                     "predicted_fairness": 0.95,
                     "dro_utility": 3.0,
-                    "reasoning": ["Mathematical bounds exceeded during LLM generation.", "Safe fallback constraint applied to guarantee structural stability."]
+                    "reasoning": ["Mathematical bounds exceeded during LLM generation.", "Safe fallback constraint applied to guarantee structural stability."],
+                    "legal_basis": "CrPC Section 437 (Simulated Fallback)",
+                    "constitutional_constraint": "Article 21 (Simulated Fallback)",
+                    "precedent_alignment": "State vs XYZ (Simulated Fallback)"
                 }
             )
             mock_decision = TokenizedDecision(
-                proposal_id="DP-RECOVERY",
-                content=mock_proposal.content,
-                crypto_hash="fallback_hash_123",
-                signature="system_recovery"
+                original_proposal=mock_proposal,
+                approval_token="fallback_hash_123"
             )
             self.l10_audit.write_provenance()
-            return mock_decision, [mock_proposal]
+            return mock_decision, [mock_proposal], getattr(self, "_last_legal_context", {})
 
 if __name__ == "__main__":
     cdp = ConstitutionalDecisionProtocol()

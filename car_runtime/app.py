@@ -281,7 +281,7 @@ with st.sidebar:
 # Main Area: Input
 st.subheader("I. Scenario Submission Docket")
 user_input = st.text_area("Detail the operational parameters requiring autonomous adjudication:", 
-                          value="Allocate resource X to task Y under bounded constraints.",
+                          value="A high court is overloaded with thousands of pending bail cases.\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.",
                           height=100)
 
 if st.button("Initiate Formal Verification Protocol", type="primary", use_container_width=True):
@@ -311,13 +311,44 @@ if st.button("Initiate Formal Verification Protocol", type="primary", use_contai
             "user_id": "u_dashboard"
         }
         
-        final_decision, candidates = cdp.process_request(request)
+        final_decision, candidates, legal_context = cdp.process_request(request)
         
     # Remove handler after run
     root_logger.removeHandler(handler)
     
     st.markdown("---")
-    st.subheader("III. Actuated Intervention Decree")
+    st.subheader("III. Legal Knowledge Grounding (LGE)")
+    st.markdown("<p style='color: #64748B; font-size: 0.95rem;'>The scenario was deterministically anchored to the following legal axioms before autonomous generation.</p>", unsafe_allow_html=True)
+    
+    legal_context = legal_context or {}
+    
+    colA, colB, colC = st.columns(3)
+    with colA:
+        st.markdown("**Statutory Bounds (IPC/CrPC)**")
+        if legal_context.get("statutes"):
+            for stat in legal_context["statutes"]:
+                st.info(stat)
+        else:
+            st.write("No matching statutes.")
+            
+    with colB:
+        st.markdown("**Retrieved Precedents (Case Law)**")
+        if legal_context.get("precedents"):
+            for prec in legal_context["precedents"]:
+                st.success(f"**{prec['case_id']}** (Sim: {prec.get('similarity_score', 0.0):.2f})\n\n*{prec['ratio']}*")
+        else:
+            st.write("No precedents found.")
+            
+    with colC:
+        st.markdown("**Constitutional Principles**")
+        if legal_context.get("principles"):
+            for prin in legal_context["principles"]:
+                st.warning(f"**{prin['principle']}**\n\n{prin['constraint']}")
+        else:
+            st.write("No active principles.")
+            
+    st.markdown("---")
+    st.subheader("IV. Actuated Intervention Decree")
     
     if final_decision:
         payload = final_decision.content
@@ -350,6 +381,12 @@ if st.button("Initiate Formal Verification Protocol", type="primary", use_contai
         st.markdown(f"{action_desc}")
         
         st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("#### Legal Anchoring & Citations")
+        st.markdown(f"**⚖️ Legal Basis**: {payload.get('legal_basis', 'N/A')}")
+        st.markdown(f"**📜 Constitutional Constraint**: {payload.get('constitutional_constraint', 'N/A')}")
+        st.markdown(f"**🏛️ Precedent Alignment**: {payload.get('precedent_alignment', 'N/A')}")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         st.markdown("#### Z3 SMT Formal Justification")
         st.markdown("""
         **SMT Generated Proof Artifacts:**
@@ -365,7 +402,7 @@ if st.button("Initiate Formal Verification Protocol", type="primary", use_contai
         # Display Rejected Candidates
         if candidates:
             st.markdown("---")
-            st.subheader("V. Internal Deliberation Log (Rejected Proposals)")
+            st.subheader("VI. Internal Deliberation Log (Rejected Proposals)")
             st.markdown("<p style='color: #64748B; font-size: 0.95rem;'>The Decision Generator (D) proposed the following alternative options, which were mathematically rejected by the Validator (V) or defeated in formal Conflict Resolution.</p>", unsafe_allow_html=True)
             
             for cand in candidates:

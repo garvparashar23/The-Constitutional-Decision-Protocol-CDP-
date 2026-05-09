@@ -1,15 +1,1 @@
-[
-    {
-        "id": "evt_1778297638.591253",
-        "type": "ACTUATION",
-        "timestamp": 1778297638.5912719,
-        "payload": {
-            "action": "Implement Action C: Abandon the Mission",
-            "predicted_risk": 0.1,
-            "predicted_fairness": 1.0,
-            "dro_utility": 7.685671409376867,
-            "reasoning": "The system will execute Action C, abandoning the mission, to ensure the safety of civilians and the system."
-        },
-        "chain_hash": "2b498ff3c5b082da9fd0626e11f1f5ee96d210d6ac08628aa9bc614078c45e4e"
-    }
-]
+[]

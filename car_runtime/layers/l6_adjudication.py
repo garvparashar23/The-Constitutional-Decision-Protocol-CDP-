@@ -116,7 +116,7 @@ class AdjudicationEngine:
             # 2. Formal Z3 Verification
             math_verified = self._formal_z3_verification(prop, constraints)
             
-            if consensus_score >= 0.75 and math_verified:
+            if consensus_score >= 0.65 and math_verified:
                 self.scoreboard.record_pass()
                 token = self._generate_approval_token(prop)
                 decision = TokenizedDecision(

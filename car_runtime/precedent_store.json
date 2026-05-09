@@ -406,5 +406,13 @@
         "resolution": "",
         "fairness_score": 7.685671409376867,
         "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_52",
+        "context": "{'context': 'Allocate resource X to task Y', 'priority': 'high', 'user_id': 'u_interactive'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 7.839355370375815,
+        "audit_outcome": "SUCCESS"
     }
 ]

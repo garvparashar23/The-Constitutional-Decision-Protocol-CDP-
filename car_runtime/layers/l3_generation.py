@@ -38,13 +38,17 @@ class DecisionGenerationEngine:
             f"You are the Generation Engine of The Constitutional Decision Protocol (CDP) system. "
             f"Generate exactly {num_candidates} distinct action proposals for the given context. "
             f"CRITICAL INSTRUCTION: You must ensure your generated values strictly adhere to these mathematical constraints: \n{rules_text}\n"
+            f"You must base your decisions on the provided legal_context (statutes, precedents, principles). "
             f"Output strictly a JSON object with a single key 'proposals' which contains a list of dictionaries. "
             f"Each dictionary must have exactly these keys: "
             f"'action' (string describing the decision), "
             f"'predicted_risk' (float between 0.0 and 1.0), "
             f"'predicted_fairness' (float between 0.0 and 1.0), "
             f"'base_utility' (float between 1.0 and 10.0), "
-            f"'reasoning' (A single objective sentence stating what the action does physically. Do NOT invent mathematical constraints or compliance justifications, as SMT will verify it later)."
+            f"'legal_basis' (string citing relevant statutes from the context), "
+            f"'constitutional_constraint' (string citing relevant constitutional principles from the context), "
+            f"'precedent_alignment' (string citing matching case laws from the context), "
+            f"'reasoning' (A single objective sentence stating what the action does physically.)"
         )
         
         user_prompt = f"Context: {json.dumps(context)}"
@@ -89,7 +93,10 @@ class DecisionGenerationEngine:
                 "predicted_risk": clamped_risk,
                 "predicted_fairness": clamped_fairness,
                 "dro_utility": adjusted_utility,
-                "reasoning": prop.get("reasoning", "The mathematical constraints determined this to be the optimal and safest path.")
+                "reasoning": prop.get("reasoning", "The mathematical constraints determined this to be the optimal and safest path."),
+                "legal_basis": prop.get("legal_basis", "No legal basis provided."),
+                "constitutional_constraint": prop.get("constitutional_constraint", "No constitutional constraint provided."),
+                "precedent_alignment": prop.get("precedent_alignment", "No precedent alignment provided.")
             }
             
             candidates.append(
