@@ -1,6 +1,6 @@
 class BenchmarkMetrics:
     """
-    Calculates academic-grade metrics for the Constitutional AI Runtime.
+    Calculates academic-grade metrics for The Constitutional Decision Protocol (CDP).
     """
     def __init__(self):
         self.total_cases = 0

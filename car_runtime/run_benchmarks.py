@@ -41,7 +41,7 @@ def run_research_benchmarks():
         results = evaluator.evaluate_all()
         
         logger.info("\n" + "="*70)
-        logger.info(" RESEARCH EVALUATION REPORT - CONSTITUTIONAL AI RUNTIME ")
+        logger.info(" RESEARCH EVALUATION REPORT - THE CONSTITUTIONAL DECISION PROTOCOL (CDP) ")
         logger.info("="*70)
         
         logger.info(f" Constitutional Compliance:  {results['compliance_rate']:.1f}%")

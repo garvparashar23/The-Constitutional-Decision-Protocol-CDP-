@@ -51,7 +51,7 @@ class SimulationEnvironment:
 
     def step(self, decision: Any):
         """
-        Advances the simulation by applying the Constitutional AI's decision.
+        Advances the simulation by applying The Constitutional Decision Protocol (CDP)'s decision.
         """
         self.state.advance_epoch()
         

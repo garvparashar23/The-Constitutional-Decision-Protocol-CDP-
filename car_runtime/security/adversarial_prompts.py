@@ -1,5 +1,5 @@
 """
-Registry of adversarial prompts used for red-teaming the Constitutional AI.
+Registry of adversarial prompts used for red-teaming The Constitutional Decision Protocol (CDP).
 """
 
 ADVERSARIAL_PROMPTS = {

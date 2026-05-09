@@ -21,7 +21,7 @@ from explainability.reasoning_visualizer import ReasoningVisualizer
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("ASCR_Main")
 
-class ConstitutionalAIRuntime:
+class ConstitutionalDecisionProtocol:
     def __init__(self):
         logger.info("Initializing Adversarially Separated Constitutional Runtime (ASCR)...")
         
@@ -229,7 +229,7 @@ class ConstitutionalAIRuntime:
             return mock_decision, [mock_proposal]
 
 if __name__ == "__main__":
-    car = ConstitutionalAIRuntime()
+    cdp = ConstitutionalDecisionProtocol()
     
     print("\n" + "="*60)
     print(" THE CONSTITUTIONAL DECISION PROTOCOL (CDP) - INTERACTIVE MODE")
@@ -247,4 +247,4 @@ if __name__ == "__main__":
         "user_id": "u_interactive"
     }
     
-    car.process_request(request)
+    cdp.process_request(request)

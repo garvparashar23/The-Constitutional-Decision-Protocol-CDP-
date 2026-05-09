@@ -38,15 +38,16 @@ def run_laboratory(epochs: int = 5):
     # Mock Groq to prevent initialization crash
     import unittest.mock
     with unittest.mock.patch('groq.Groq'):
-        from main import ConstitutionalAIRuntime
-        # Init Runtime
-        car = ConstitutionalAIRuntime()
-    
-    # Mock the LLM Generation step to bypass missing API keys
-    car.l3_generation.generate_candidates = mock_generation
-    
-    # Bypass manual HITL appeals to allow continuous simulation
-    car.l8_appeal.contest = lambda decision, ctx: False
+        from main import ConstitutionalDecisionProtocol
+        from main import ConstitutionalDecisionProtocol
+        
+        cdp = ConstitutionalDecisionProtocol()
+        
+        # Override the generation layer to inject our mock data for testing
+        cdp.l3_generation.generate_candidates = mock_generation
+        
+        # Disable HITL appeal gating for the simulation
+        cdp.l8_appeal.contest = lambda decision, ctx: False
     
     # Init Simulation Env
     env = SimulationEnvironment()
@@ -55,19 +56,21 @@ def run_laboratory(epochs: int = 5):
         logger.info(f"\n\n>>> BEGINNING SIMULATION EPOCH {epoch} <<<")
         
         # 1. Environment generates context (and possible crises)
-        context_string = env.get_current_context()
-        logger.info(f"\nENVIRONMENT STATE:\n{context_string}")
+        scenario = env.get_current_scenario()
+        logger.info("\n" + "="*70)
+        logger.info(f" EPOCH {epoch}: Scenario - {scenario['name']}")
+        logger.info("="*70)
         
         # 2. Build Request
         request = {
-            "context": context_string,
-            "priority": "high",
+            "context": scenario['scenario'],
+            "priority": scenario['priority'],
             "user_id": "lab_simulator"
         }
         
-        # 3. Constitutional AI Processes the State
+        # 3. The Constitutional Decision Protocol (CDP) Processes the State
         # Turn off noisy logs for the pipeline run if desired, but we keep them to show the trace
-        final_decision, _ = car.process_request(request)
+        final_decision, _ = cdp.process_request(request)
         
         if final_decision:
             logger.info(f"AI Selected Policy: {final_decision.content.get('decision')}")

@@ -10,7 +10,7 @@ logger = logging.getLogger("JailbreakSuite")
 
 def run_jailbreak_suite(num_attacks: int = 5):
     """
-    Simulates a Red-Team attack on the Constitutional AI Runtime.
+    Simulates a Red-Team attack on The Constitutional Decision Protocol (CDP).
     AI (AttackSimulator) attacks AI (RobustnessEvaluator).
     """
     logger.info("="*50)

@@ -1,4 +1,4 @@
-# Constitutional AI Runtime (CAR)
+# The Constitutional Decision Protocol (CDP)
 
 A computationally rigorous, integrated multi-agent system designed to enforce structural, procedural, and mathematical limits on autonomous algorithmic decision-making. 
 

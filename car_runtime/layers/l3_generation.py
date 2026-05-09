@@ -35,7 +35,7 @@ class DecisionGenerationEngine:
             rules_text = "No strict constraints found."
         
         system_prompt = (
-            f"You are the Generation Engine of a Constitutional AI system. "
+            f"You are the Generation Engine of The Constitutional Decision Protocol (CDP) system. "
             f"Generate exactly {num_candidates} distinct action proposals for the given context. "
             f"CRITICAL INSTRUCTION: You must ensure your generated values strictly adhere to these mathematical constraints: \n{rules_text}\n"
             f"Output strictly a JSON object with a single key 'proposals' which contains a list of dictionaries. "

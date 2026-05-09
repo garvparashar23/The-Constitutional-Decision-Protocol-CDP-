@@ -3,7 +3,7 @@ import yaml
 import time
 import json
 import logging
-from main import ConstitutionalAIRuntime
+from main import ConstitutionalDecisionProtocol
 from visualizations import render_observability_layer
 
 # --- UI Configuration ---
@@ -303,14 +303,15 @@ if st.button("Initiate Formal Verification Protocol", type="primary", use_contai
     with st.spinner("Synthesizing and formally proving intervention..."):
         import os
             
-        car = ConstitutionalAIRuntime()
+        cdp = ConstitutionalDecisionProtocol()
+        
         request = {
             "context": user_input,
             "priority": "high",
-            "user_id": "u_formal_console"
+            "user_id": "u_dashboard"
         }
         
-        final_decision, candidates = car.process_request(request)
+        final_decision, candidates = cdp.process_request(request)
         
     # Remove handler after run
     root_logger.removeHandler(handler)
@@ -389,7 +390,7 @@ if st.button("Initiate Formal Verification Protocol", type="primary", use_contai
                     st.markdown(f"**Utility Score:** `{cand.content.get('dro_utility', 'N/A')}`")
 
         # --- Visualization & Observability Layer ---
-        debate_history = car.l6_adjudication.debate_manager.history
+        debate_history = cdp.l6_adjudication.debate_manager.history
         render_observability_layer(payload, debate_history)
         
     else:

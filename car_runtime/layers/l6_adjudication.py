@@ -95,7 +95,7 @@ class AdjudicationEngine:
         return (result == z3.sat)
 
     def execute_consensus(self, proposals: List[SanitizedProposal], original_proposals: Dict[str, DecisionProposal], constraints: List[Constraint]) -> List[TokenizedDecision]:
-        logger.info(f"Constitutional AI Parliament: Deliberating on {len(proposals)} proposals.")
+        logger.info(f"CDP Parliament: Deliberating on {len(proposals)} proposals.")
         valid_decisions = []
         
         for prop in proposals:
