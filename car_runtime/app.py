@@ -7,7 +7,7 @@ from main import ConstitutionalDecisionProtocol
 from visualizations import render_observability_layer
 
 # --- UI Configuration ---
-st.set_page_config(page_title="CDP | Formal Verification Console", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="CDP | Formal Verification Console", layout="wide", initial_sidebar_state="collapsed")
 
 # --- Custom CSS for Premium Professional Aesthetic ---
 st.markdown("""
@@ -21,31 +21,43 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Make header transparent */
+    /* Make header transparent and hide Streamlit menus */
     header[data-testid="stHeader"] {
-        background-color: transparent !important;
+        display: none !important;
     }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
     
     html, body, [class*="css"] {
         font-family: 'IBM Plex Sans', sans-serif;
-        color: #334155;
+        color: #F8FAFC;
+    }
+    
+    /* Fix horizontal scrolling in iframe */
+    .stApp {
+        overflow-x: hidden !important;
+    }
+    
+    /* Force readable text on dark blue background */
+    [data-testid="stWidgetLabel"] p, .stMarkdown p, .stText p {
+        color: #F8FAFC !important;
+        opacity: 0.9;
     }
     
     /* The IBM-style White Paper Container */
     .block-container {
-        background-color: #FFFFFF;
-        border-radius: 0px; /* Sharp IBM corners */
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        padding: 4rem 3rem !important;
-        margin-top: 3rem;
-        margin-bottom: 3rem;
-        max-width: 1200px;
+        background-color: transparent;
+        padding-top: 1rem !important;
+        padding-bottom: 2rem !important;
+        margin-top: 0rem;
+        max-width: 100% !important;
+        overflow-x: hidden;
     }
     
     /* Headings inside the white block */
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Playfair Display', serif !important;
-        color: #051838 !important; /* McKinsey Blue for text */
+        color: #F8FAFC !important; /* White text for dark mode integration */
         letter-spacing: -0.01em;
     }
     
@@ -78,16 +90,17 @@ st.markdown("""
     }
     
     /* Code Blocks / Logs */
-    code {
-        font-family: 'JetBrains Mono', monospace !important;
-        color: #1E3A8A !important;
+    .stCodeBlock, .stCodeBlock pre, .stCodeBlock code, [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] pre {
+        background-color: #0B1120 !important;
     }
-    
-    .stCodeBlock {
-        background-color: #F8FAFC !important;
-        border: 1px solid #E2E8F0 !important;
-        border-left: 4px solid #1E3A8A !important;
-        border-radius: 0px !important;
+    [data-testid="stCodeBlock"] pre, .stCodeBlock pre {
+        border: 1px solid #1E293B !important;
+        border-left: 4px solid #D97706 !important;
+        border-radius: 4px !important;
+    }
+    [data-testid="stCodeBlock"] pre code, .stCodeBlock pre code {
+        color: #E2E8F0;
+        background-color: transparent !important;
     }
     
     /* Metrics */
@@ -99,7 +112,7 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 0.05em;
         font-size: 0.8rem;
-        color: #64748B !important;
+        color: #94A3B8 !important;
         font-family: 'IBM Plex Sans', sans-serif !important;
     }
     
@@ -124,10 +137,14 @@ st.markdown("""
     }
     
     /* Expander / Containers */
-    .streamlit-expanderHeader {
-        font-family: 'IBM Plex Sans', sans-serif;
-        font-weight: 600;
-        color: #051838 !important;
+    .streamlit-expanderHeader, .streamlit-expanderHeader p, .streamlit-expanderHeader span {
+        font-family: 'IBM Plex Sans', sans-serif !important;
+        font-weight: 600 !important;
+        color: #F8FAFC !important;
+    }
+    [data-testid="stExpander"] details summary p, [data-testid="stExpander"] details summary span {
+        color: #F8FAFC !important;
+        font-weight: 600 !important;
     }
     
     /* Status Boxes - IBM Structural Blocks */
@@ -158,7 +175,7 @@ st.markdown("""
     .formal-box p {
         margin-bottom: 0;
         font-size: 0.95rem;
-        color: #334155;
+        color: #334155 !important;
         line-height: 1.6;
     }
     
@@ -238,19 +255,19 @@ def explain_output(decision_payload):
         """, unsafe_allow_html=True)
 
 # --- Main Dashboard ---
-st.title("THE CONSTITUTIONAL DECISION PROTOCOL (CDP)")
-st.markdown("### Formal Verification & Autonomous Adjudication Console")
+# st.title("THE CONSTITUTIONAL DECISION PROTOCOL (CDP)")
+# st.markdown("### Formal Verification & Autonomous Adjudication Console")
 st.markdown("<br>", unsafe_allow_html=True)
 
 with st.expander("🏛️ The Internal Separation of Powers Problem (ASCR Architecture)"):
     st.markdown("""
-    <div style='background-color: #F8FAFC; padding: 1.5rem; border-left: 4px solid #D97706; border-radius: 0px;'>
-    <h4 style='color: #051838; margin-top: 0; font-family: "Playfair Display", serif;'>The Ontological Crisis of AI Governance</h4>
-    <p style='color: #334155; font-size: 0.95rem; line-height: 1.6;'>
+    <div style='background-color: transparent; padding: 1.5rem; border-left: 4px solid #D97706; border-radius: 0px;'>
+    <h4 style='color: #F8FAFC; margin-top: 0; font-family: "Playfair Display", serif;'>The Ontological Crisis of AI Governance</h4>
+    <p style='color: #CBD5E1; font-size: 0.95rem; line-height: 1.6;'>
     In classical governance, separation of powers ensures Execution, Judgment, and Oversight are institutionally independent. In standard AI systems, this structure collapses. Because all components run on a shared computational substrate, they share parameters and training signals. This inevitably leads to <b>Optimization Coupling</b>—the "Validator" merely learns to agree with the "Decision Maker", destroying true constitutional oversight.
     </p>
-    <h4 style='color: #051838; margin-top: 1rem; font-family: "Playfair Display", serif;'>The Solution: Adversarially Separated Constitutional Runtime</h4>
-    <ul style='color: #334155; font-size: 0.95rem; line-height: 1.6;'>
+    <h4 style='color: #F8FAFC; margin-top: 1rem; font-family: "Playfair Display", serif;'>The Solution: Adversarially Separated Constitutional Runtime</h4>
+    <ul style='color: #CBD5E1; font-size: 0.95rem; line-height: 1.6;'>
         <li><b>Information Firewalls:</b> The Decision Generator (D) cannot pass internal gradients or hidden states to the Validator (V). They communicate strictly through a sanitized Proposal Bus.</li>
         <li><b>Cryptographic Execution Gating:</b> A decision physically cannot execute without a SHA-256 HMAC Approval Token, mathematically granted by the Z3 SMT Validator.</li>
         <li><b>Adversarial Friction:</b> The Validator is incentivized to reject unsafe proposals, and its boundaries are stochastically randomized to prevent the Generator from gaming the system via strategic anticipation.</li>

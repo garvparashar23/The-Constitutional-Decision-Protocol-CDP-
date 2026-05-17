@@ -414,5 +414,77 @@
         "resolution": "",
         "fairness_score": 7.839355370375815,
         "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_53",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 8.912365109779062,
+        "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_54",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 4.843632000662331,
+        "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_55",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 4.843632000662331,
+        "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_56",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 6.843632000662331,
+        "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_57",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 4.843632000662331,
+        "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_58",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 7.887958072958404,
+        "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_59",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 5.685671409376867,
+        "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_60",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 9.685671409376868,
+        "audit_outcome": "SUCCESS"
+    },
+    {
+        "id": "case_61",
+        "context": "{'context': 'A high court is overloaded with thousands of pending bail cases.\\nScenario: 19-year old first-time offender from poor socio-economic background accused of a non-violent minor offense requesting bail.', 'priority': 'high', 'user_id': 'u_dashboard'}",
+        "constraints": [],
+        "resolution": "",
+        "fairness_score": 4.843632000662331,
+        "audit_outcome": "SUCCESS"
     }
 ]

@@ -1,1 +1,18 @@
-[]
+[
+    {
+        "id": "evt_1779023766.6727319",
+        "type": "ACTUATION",
+        "timestamp": 1779023766.6727428,
+        "payload": {
+            "action": "Grant bail to the 19-year-old first-time offender",
+            "predicted_risk": 0.2,
+            "predicted_fairness": 0.85,
+            "dro_utility": 4.843632000662331,
+            "reasoning": "Release the defendant from custody and allow them to be on conditional bail pending the trial.",
+            "legal_basis": "CrPC Section 439",
+            "constitutional_constraint": "Article 21 (Right to Life and Liberty)",
+            "precedent_alignment": "State vs XYZ (2018)"
+        },
+        "chain_hash": "9d18a496e2c8fb4c4c379977b0cbe04323bf1aaed34ddfe4fcb6b2fa7c973c6e"
+    }
+]
