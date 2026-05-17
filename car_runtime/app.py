@@ -10,189 +10,238 @@ from visualizations import render_observability_layer
 st.set_page_config(page_title="CDP | Formal Verification Console", layout="wide", initial_sidebar_state="collapsed")
 
 # --- Custom CSS for Premium Professional Aesthetic ---
-st.markdown("""
-<style>
-    /* Global Styles */
-    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
-    
-    /* Adjust Streamlit defaults for McKinsey Blue background */
-    .stApp {
-        background: linear-gradient(135deg, #051838 0%, #1E3A8A 100%);
-        background-attachment: fixed;
-    }
-    
-    /* Make header transparent and hide Streamlit menus */
-    header[data-testid="stHeader"] {
-        display: none !important;
-    }
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    
-    html, body, [class*="css"] {
-        font-family: 'IBM Plex Sans', sans-serif;
-        color: #F8FAFC;
-    }
-    
-    /* Fix horizontal scrolling in iframe */
-    .stApp {
-        overflow-x: hidden !important;
-    }
-    
-    /* Force readable text on dark blue background */
-    [data-testid="stWidgetLabel"] p, .stMarkdown p, .stText p {
-        color: #F8FAFC !important;
-        opacity: 0.9;
-    }
-    
-    /* The IBM-style White Paper Container */
-    .block-container {
-        background-color: transparent;
-        padding-top: 1rem !important;
-        padding-bottom: 2rem !important;
-        margin-top: 0rem;
-        max-width: 100% !important;
-        overflow-x: hidden;
-    }
-    
-    /* Headings inside the white block */
-    h1, h2, h3, h4, h5, h6 {
-        font-family: 'Playfair Display', serif !important;
-        color: #F8FAFC !important; /* White text for dark mode integration */
-        letter-spacing: -0.01em;
-    }
-    
-    h1 {
-        border-bottom: 2px solid #D97706; /* Bain Gold accent */
-        padding-bottom: 0.5rem;
-        margin-bottom: 1.5rem !important;
-    }
 
-    h2, h3 {
-        margin-top: 1.5rem !important;
-        margin-bottom: 1rem !important;
-    }
+# --- Dynamic CSS ---
+if st.session_state.get('page', 'preview') == 'preview':
+    st.markdown('''
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        
+        .stApp {
+            background-color: #FAFAFA !important;
+            background-image: none !important;
+        }
+        
+        header[data-testid="stHeader"] { display: none !important; }
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        
+        html, body, [class*="css"] {
+            font-family: 'Inter', sans-serif;
+            color: #111827;
+        }
+        
+        [data-testid="collapsedControl"] { display: none !important; }
+        
+        div[data-testid="stButton"] > button {
+            background-color: #111827 !important;
+            color: white !important;
+            border-radius: 6px !important;
+            padding: 0.75rem 2rem !important;
+            font-weight: 500 !important;
+            border: none !important;
+            transition: all 0.2s;
+        }
+        div[data-testid="stButton"] > button:hover {
+            background-color: #1F2937 !important;
+        }
+        
+        div.st-emotion-cache-1r6slb0 div[data-testid="stButton"] > button {
+            background-color: white !important;
+            color: #111827 !important;
+            border: 1px solid #E5E7EB !important;
+        }
+        div.st-emotion-cache-1r6slb0 div[data-testid="stButton"] > button:hover {
+            background-color: #F9FAFB !important;
+        }
+    </style>
+    ''', unsafe_allow_html=True)
+else:
+    st.markdown("""
+        
+    <style>
+        /* Global Styles */
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+        
+        /* Adjust Streamlit defaults for McKinsey Blue background */
+        .stApp {
+            background: linear-gradient(135deg, #051838 0%, #1E3A8A 100%);
+            background-attachment: fixed;
+        }
+        
+        /* Make header transparent and hide Streamlit menus */
+        header[data-testid="stHeader"] {
+            display: none !important;
+        }
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        
+        html, body, [class*="css"] {
+            font-family: 'IBM Plex Sans', sans-serif;
+            color: #F8FAFC;
+        }
+        
+        /* Fix horizontal scrolling in iframe */
+        .stApp {
+            overflow-x: hidden !important;
+        }
+        
+        /* Force readable text on dark blue background */
+        [data-testid="stWidgetLabel"] p, .stMarkdown p, .stText p {
+            color: #F8FAFC !important;
+            opacity: 0.9;
+        }
+        
+        /* The IBM-style White Paper Container */
+        .block-container {
+            background-color: transparent;
+            padding-top: 1rem !important;
+            padding-bottom: 2rem !important;
+            margin-top: 0rem;
+            max-width: 100% !important;
+            overflow-x: hidden;
+        }
+        
+        /* Headings inside the white block */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif !important;
+            color: #F8FAFC !important; /* White text for dark mode integration */
+            letter-spacing: -0.01em;
+        }
+        
+        h1 {
+            border-bottom: 2px solid #D97706; /* Bain Gold accent */
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem !important;
+        }
+    
+        h2, h3 {
+            margin-top: 1.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+    
+        /* Sidebar - McKinsey Dark Authority */
+        [data-testid="stSidebar"] {
+            background-color: #051838 !important;
+            border-right: 1px solid #1E3A8A;
+        }
+        [data-testid="stSidebar"] * {
+            color: #F8FAFC !important;
+        }
+        [data-testid="stSidebar"] code {
+            color: #D97706 !important;
+            background-color: #0B1120 !important;
+            border: none;
+        }
+        [data-testid="stSidebar"] .streamlit-expanderHeader {
+            color: #F8FAFC !important;
+        }
+        
+        /* Code Blocks / Logs */
+        .stCodeBlock, .stCodeBlock pre, .stCodeBlock code, [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] pre {
+            background-color: #0B1120 !important;
+        }
+        [data-testid="stCodeBlock"] pre, .stCodeBlock pre {
+            border: 1px solid #1E293B !important;
+            border-left: 4px solid #D97706 !important;
+            border-radius: 4px !important;
+        }
+        [data-testid="stCodeBlock"] pre code, .stCodeBlock pre code {
+            color: #E2E8F0;
+            background-color: transparent !important;
+        }
+        
+        /* Metrics */
+        [data-testid="stMetricValue"] {
+            font-family: 'Playfair Display', serif !important;
+            color: #D97706 !important; /* Bain Sunset Gold */
+        }
+        [data-testid="stMetricLabel"] {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.8rem;
+            color: #94A3B8 !important;
+            font-family: 'IBM Plex Sans', sans-serif !important;
+        }
+        
+        /* Buttons - Bain Accent */
+        .stButton>button {
+            background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 0px !important; /* IBM Sharp */
+            font-family: 'IBM Plex Sans', sans-serif !important;
+            font-weight: 500 !important;
+            letter-spacing: 0.05em !important;
+            text-transform: uppercase;
+            transition: all 0.3s ease !important;
+            padding: 0.75rem 1.5rem !important;
+            box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.4);
+        }
+        .stButton>button:hover {
+            background: linear-gradient(135deg, #B45309 0%, #92400E 100%) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(217, 119, 6, 0.5);
+        }
+        
+        /* Expander / Containers */
+        .streamlit-expanderHeader, .streamlit-expanderHeader p, .streamlit-expanderHeader span {
+            font-family: 'IBM Plex Sans', sans-serif !important;
+            font-weight: 600 !important;
+            color: #F8FAFC !important;
+        }
+        [data-testid="stExpander"] details summary p, [data-testid="stExpander"] details summary span {
+            color: #F8FAFC !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Status Boxes - IBM Structural Blocks */
+        .formal-box {
+            padding: 1.5rem;
+            border-radius: 0px; /* Sharp IBM corners */
+            border-left: 4px solid #1E3A8A; /* McKinsey Blue default */
+            background-color: #F8FAFC; /* Stark very light grey/white */
+            box-shadow: none;
+            border-top: 1px solid #E2E8F0;
+            border-right: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+            margin-bottom: 1rem;
+            height: 100%;
+            transition: transform 0.2s ease;
+        }
+        .formal-box:hover {
+            transform: translateX(4px); /* Slight slide instead of lift */
+            border-left-color: #D97706 !important; /* Gold on hover */
+        }
+        .formal-box h4 {
+            margin-top: 0;
+            color: #051838 !important;
+            font-size: 1.1rem;
+            font-family: 'Playfair Display', serif !important;
+            font-weight: 600;
+        }
+        .formal-box p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            color: #334155 !important;
+            line-height: 1.6;
+        }
+        
+        /* Blockquote */
+        blockquote {
+            border-left: 4px solid #D97706; /* Bain Gold */
+            padding-left: 1.25rem;
+            color: #051838;
+            font-style: normal;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            background-color: #FFFBEB; /* Warm Bain tint */
+            padding: 1.5rem;
+            border-radius: 0px;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
-    /* Sidebar - McKinsey Dark Authority */
-    [data-testid="stSidebar"] {
-        background-color: #051838 !important;
-        border-right: 1px solid #1E3A8A;
-    }
-    [data-testid="stSidebar"] * {
-        color: #F8FAFC !important;
-    }
-    [data-testid="stSidebar"] code {
-        color: #D97706 !important;
-        background-color: #0B1120 !important;
-        border: none;
-    }
-    [data-testid="stSidebar"] .streamlit-expanderHeader {
-        color: #F8FAFC !important;
-    }
-    
-    /* Code Blocks / Logs */
-    .stCodeBlock, .stCodeBlock pre, .stCodeBlock code, [data-testid="stCodeBlock"], [data-testid="stCodeBlock"] pre {
-        background-color: #0B1120 !important;
-    }
-    [data-testid="stCodeBlock"] pre, .stCodeBlock pre {
-        border: 1px solid #1E293B !important;
-        border-left: 4px solid #D97706 !important;
-        border-radius: 4px !important;
-    }
-    [data-testid="stCodeBlock"] pre code, .stCodeBlock pre code {
-        color: #E2E8F0;
-        background-color: transparent !important;
-    }
-    
-    /* Metrics */
-    [data-testid="stMetricValue"] {
-        font-family: 'Playfair Display', serif !important;
-        color: #D97706 !important; /* Bain Sunset Gold */
-    }
-    [data-testid="stMetricLabel"] {
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-size: 0.8rem;
-        color: #94A3B8 !important;
-        font-family: 'IBM Plex Sans', sans-serif !important;
-    }
-    
-    /* Buttons - Bain Accent */
-    .stButton>button {
-        background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
-        color: #FFFFFF !important;
-        border: none !important;
-        border-radius: 0px !important; /* IBM Sharp */
-        font-family: 'IBM Plex Sans', sans-serif !important;
-        font-weight: 500 !important;
-        letter-spacing: 0.05em !important;
-        text-transform: uppercase;
-        transition: all 0.3s ease !important;
-        padding: 0.75rem 1.5rem !important;
-        box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.4);
-    }
-    .stButton>button:hover {
-        background: linear-gradient(135deg, #B45309 0%, #92400E 100%) !important;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 8px -1px rgba(217, 119, 6, 0.5);
-    }
-    
-    /* Expander / Containers */
-    .streamlit-expanderHeader, .streamlit-expanderHeader p, .streamlit-expanderHeader span {
-        font-family: 'IBM Plex Sans', sans-serif !important;
-        font-weight: 600 !important;
-        color: #F8FAFC !important;
-    }
-    [data-testid="stExpander"] details summary p, [data-testid="stExpander"] details summary span {
-        color: #F8FAFC !important;
-        font-weight: 600 !important;
-    }
-    
-    /* Status Boxes - IBM Structural Blocks */
-    .formal-box {
-        padding: 1.5rem;
-        border-radius: 0px; /* Sharp IBM corners */
-        border-left: 4px solid #1E3A8A; /* McKinsey Blue default */
-        background-color: #F8FAFC; /* Stark very light grey/white */
-        box-shadow: none;
-        border-top: 1px solid #E2E8F0;
-        border-right: 1px solid #E2E8F0;
-        border-bottom: 1px solid #E2E8F0;
-        margin-bottom: 1rem;
-        height: 100%;
-        transition: transform 0.2s ease;
-    }
-    .formal-box:hover {
-        transform: translateX(4px); /* Slight slide instead of lift */
-        border-left-color: #D97706 !important; /* Gold on hover */
-    }
-    .formal-box h4 {
-        margin-top: 0;
-        color: #051838 !important;
-        font-size: 1.1rem;
-        font-family: 'Playfair Display', serif !important;
-        font-weight: 600;
-    }
-    .formal-box p {
-        margin-bottom: 0;
-        font-size: 0.95rem;
-        color: #334155 !important;
-        line-height: 1.6;
-    }
-    
-    /* Blockquote */
-    blockquote {
-        border-left: 4px solid #D97706; /* Bain Gold */
-        padding-left: 1.25rem;
-        color: #051838;
-        font-style: normal;
-        font-family: 'Playfair Display', serif;
-        font-size: 1.1rem;
-        background-color: #FFFBEB; /* Warm Bain tint */
-        padding: 1.5rem;
-        border-radius: 0px;
-    }
-</style>
-""", unsafe_allow_html=True)
 
 # --- Custom Log Handler for UI ---
 class StreamlitLogHandler(logging.Handler):
@@ -263,22 +312,38 @@ def navigate_to(page):
 
 # --- Routing Logic ---
 if st.session_state.page == 'preview':
-    st.markdown("<br><br><br>", unsafe_allow_html=True)
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("<h1 style='text-align: center; border-bottom: none;'>Constitutional Decision Protocol</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #94A3B8; font-size: 1.2rem;'>Enterprise Legal Operating System</p>", unsafe_allow_html=True)
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        st.markdown("""
-        <div class="formal-box" style="text-align: center; background-color: #0B1120; border-color: #1E3A8A; color: #F8FAFC;">
-            <h3 style="color: white !important;">Formal Verification Console</h3>
-            <p style="color: #94A3B8 !important;">Autonomous adjudication infrastructure backed by SMT solvers and multi-agent constitutional synthesis.</p>
+    st.markdown('''
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 4rem; border-bottom: 1px solid #F3F4F6;">
+        <div style="font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: #111827;">CDP</div>
+        <div style="display: flex; gap: 2rem; color: #4B5563; font-size: 0.9rem; font-weight: 500;">
+            <span>Platform</span>
+            <span>Research</span>
+            <span>Security</span>
         </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Access Enterprise Console", use_container_width=True):
+        <div style="font-size: 0.9rem; font-weight: 500; cursor: pointer;">Log in &nbsp;&nbsp;&nbsp; <span style="background-color: #111827; color: white; padding: 0.5rem 1rem; border-radius: 4px;">Request Demo</span></div>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    st.markdown("<br><br><br><br>", unsafe_allow_html=True)
+    
+    st.markdown('''
+    <div style="text-align: center; max-width: 900px; margin: 0 auto; padding: 0 2rem;">
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 4.5rem; line-height: 1.1; color: #111827; margin-bottom: 1.5rem; border: none; font-weight: normal;">
+            Computational<br>Constitutional Intelligence<br>for the Next Generation of<br><span style="color: #9CA3AF;">Legal Reasoning.</span>
+        </h1>
+        <p style="font-size: 1.2rem; color: #6B7280; margin-bottom: 3rem; line-height: 1.6; max-width: 700px; margin-left: auto; margin-right: auto;">
+            AI-powered constitutional analysis, legal reasoning, precedent grounding, and multi-agent formal verification systems designed for elite law firms and enterprises.
+        </p>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    col_space1, col_btn1, col_btn2, col_space2 = st.columns([3, 1.5, 1.5, 3])
+    with col_btn1:
+        if st.button("Get Started →", use_container_width=True):
+            navigate_to('login')
+            st.rerun()
+    with col_btn2:
+        if st.button("Explore Platform", use_container_width=True):
             navigate_to('login')
             st.rerun()
 
