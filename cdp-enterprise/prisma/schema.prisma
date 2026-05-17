@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id                String            @id @default(uuid())
+  full_name         String
+  email             String            @unique
+  password_hash     String
+  role              String            @default("USER") // USER, ADMIN, RESEARCHER
+  profile_image     String?
+  subscription_plan String            @default("FREE")
+  created_at        DateTime          @default(now())
+
+  // Relations
+  histories         UserHistory[]
+  sessions          Session[]
+}
+
+model UserHistory {
+  id                  String   @id @default(uuid())
+  user_id             String
+  scenario_input      String
+  generated_output    String
+  verification_status String
+  created_at          DateTime @default(now())
+
+  user                User     @relation(fields: [user_id], references: [id])
+}
+
+model Session {
+  id                           String   @id @default(uuid())
+  user_id                      String
+  legal_query                  String
+  constitutional_articles_used String   // Stored as JSON string
+  precedents_used              String   // Stored as JSON string
+  final_reasoning              String
+  confidence_score             Float
+  verification_logs            String   // Stored as JSON string
+  created_at                   DateTime @default(now())
+
+  user                         User     @relation(fields: [user_id], references: [id])
+}
+
+model AILog {
+  id                 String   @id @default(uuid())
+  prompt_history     String   // JSON string
+  model_outputs      String   // JSON string
+  conflict_detection String   // JSON string
+  reasoning_chain    String   // JSON string
+  created_at         DateTime @default(now())
+}
