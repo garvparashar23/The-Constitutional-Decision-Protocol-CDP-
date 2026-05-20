@@ -316,7 +316,7 @@ export default function WorkspacePage() {
   ];
 
   const handleInitialize = () => {
-    if (!scenarioText.trim()) {
+    if (!scenarioText || !scenarioText.trim()) {
       alert("Please enter a legal scenario or upload a document to initialize the pipeline.");
       return;
     }
@@ -324,22 +324,22 @@ export default function WorkspacePage() {
     setIsInitializing(true);
     setInitStep(0);
     
-    // Progressively update steps to show high-fidelity initialization
+    // Progressively update steps safely without side effects inside the state updater function
+    let currentStep = 0;
     const interval = setInterval(() => {
-      setInitStep((prev) => {
-        if (prev >= 4) {
-          clearInterval(interval);
-          setTimeout(() => {
-            const result = generateLegalAnalysis(scenarioText);
-            setAnalysis(result);
-            setIsInitializing(false);
-            setIsInitialized(true);
-            setActiveTab('grounding');
-          }, 600);
-          return 4;
-        }
-        return prev + 1;
-      });
+      currentStep += 1;
+      if (currentStep > 4) {
+        clearInterval(interval);
+        setTimeout(() => {
+          const result = generateLegalAnalysis(scenarioText);
+          setAnalysis(result);
+          setIsInitializing(false);
+          setIsInitialized(true);
+          setActiveTab('grounding');
+        }, 300);
+      } else {
+        setInitStep(currentStep);
+      }
     }, 800);
   };
 
